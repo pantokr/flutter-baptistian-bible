@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "31225390287",
+    "project_id": "the-holy-bible-baptist",
+    "storage_bucket": "the-holy-bible-baptist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31225390287:android:3f548865151c26865ac3ba",
+        "android_client_info": {
+          "package_name": "com.example.bible"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB25APbowsnjqKu7FAxhMPt8xh3Bjb35Hs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
