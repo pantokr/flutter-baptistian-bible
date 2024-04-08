@@ -2,7 +2,9 @@ import 'package:bible/main.dart';
 import 'package:bible/provider/list.dart';
 import 'package:bible/provider/provider.dart';
 import 'package:bible/screens/copy_screen.dart';
-import 'package:bible/widgets/verse_builder.dart';
+import 'package:bible/screens/search_screen.dart';
+import 'package:bible/widgets/dialog.dart';
+import 'package:bible/widgets/page_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +30,7 @@ class _VerseScreenState extends State<VerseScreen> {
       appBar: buildAppBar(_key, theme: themeData.appBarTheme),
       endDrawer: buildDrawer(colorScheme),
       backgroundColor: themeData.scaffoldBackgroundColor,
-      body: const VerseBuilder(),
+      body: const PageBuilder(),
       bottomNavigationBar: buildBottomAppBar(),
     );
   }
@@ -45,19 +47,19 @@ class _VerseScreenState extends State<VerseScreen> {
             ),
             child: const Center(
               child: Text(
-                '내가 진실로 속히 오리라 하시거늘\n\n아멘 주 예수여 오시옵소서',
+                '내가 진실로 속히 오리라 하시거늘\n아멘 주 예수여 오시옵소서',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
           ),
-          _buildMenuListTile("인명 사전 (미완)", 0),
-          _buildMenuListTile("지명 사전 (미완)", 1),
-          _buildMenuListTile("지도 (미완)", 2),
-          _buildMenuListTile("단위 (미완)", 3),
+          buildMenuListTile("인명 사전 (미완)", 0),
+          buildMenuListTile("지명 사전 (미완)", 1),
+          buildMenuListTile("지도 (미완)", 2),
+          buildMenuListTile("단위 (미완)", 3),
           const Divider(
             thickness: 4,
           ),
-          _buildMenuListTile("화면 설정", 4),
+          buildMenuListTile("화면 설정", 4),
         ],
       ),
     );
@@ -69,7 +71,7 @@ class _VerseScreenState extends State<VerseScreen> {
     });
   }
 
-  Widget _buildMenuListTile(String content, int number) {
+  buildMenuListTile(String content, int number) {
     return ListTile(
       title: Text(
         content,
@@ -98,7 +100,7 @@ class _VerseScreenState extends State<VerseScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    buildTitleDialog(context);
+                    showTitleDialog(context, currentBible.curTitleList);
                   },
                   child: Container(
                     alignment: Alignment.center,
@@ -107,7 +109,7 @@ class _VerseScreenState extends State<VerseScreen> {
                         border:
                             Border(bottom: BorderSide(color: Colors.white))),
                     child: Text(
-                      bookListKor[currentBible.lbt].toString(),
+                      bookListKor[currentBible.lastBibleTitle].toString(),
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -117,7 +119,7 @@ class _VerseScreenState extends State<VerseScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    buildChapterDialog(context);
+                    showChapterDialog(context);
                   },
                   child: Container(
                     alignment: Alignment.center,
@@ -126,7 +128,7 @@ class _VerseScreenState extends State<VerseScreen> {
                         border:
                             Border(bottom: BorderSide(color: Colors.white))),
                     child: Text(
-                      '- ${currentBible.lbc} -',
+                      '- ${currentBible.lastBibleChapter + 1} -',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -134,25 +136,6 @@ class _VerseScreenState extends State<VerseScreen> {
                     ),
                   ),
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     buildTypeDialog(context);
-                //   },
-                //   child: Container(
-                //     alignment: Alignment.center,
-                //     height: 32,
-                //     decoration: const BoxDecoration(
-                //         border:
-                //             Border(bottom: BorderSide(color: Colors.white))),
-                //     child: Text(
-                //       currentBible.bt,
-                //       style: const TextStyle(
-                //         fontSize: 16,
-                //         color: Colors.white,
-                //       ),
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           );
@@ -163,7 +146,6 @@ class _VerseScreenState extends State<VerseScreen> {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
-              IconButton(icon: const Icon(Icons.search), onPressed: () {}),
               IconButton(
                 icon: const Icon(Icons.menu),
                 onPressed: () {
@@ -188,7 +170,7 @@ class _VerseScreenState extends State<VerseScreen> {
             height: 64,
             child: ElevatedButton(
               onPressed: () {
-                CopyScreen.openCopyScreen(context);
+                openCopyScreen(context, []);
               },
               style: ElevatedButton.styleFrom(
                 elevation: 8,
@@ -197,7 +179,25 @@ class _VerseScreenState extends State<VerseScreen> {
                 shape:
                     const CircleBorder(side: BorderSide(color: Colors.black26)),
               ),
-              child: Icon(Icons.check,
+              child: Icon(Icons.border_color,
+                  size: 32, color: CustomThemeData.colorScheme.primary),
+            ),
+          ),
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: ElevatedButton(
+              onPressed: () {
+                _openSearchScreen(context);
+              },
+              style: ElevatedButton.styleFrom(
+                elevation: 8,
+                shadowColor: Colors.black,
+                backgroundColor: CustomThemeData.colorScheme.background,
+                shape:
+                    const CircleBorder(side: BorderSide(color: Colors.black26)),
+              ),
+              child: Icon(Icons.search,
                   size: 32, color: CustomThemeData.colorScheme.primary),
             ),
           ),
@@ -206,193 +206,31 @@ class _VerseScreenState extends State<VerseScreen> {
     );
   }
 
-  buildTitleDialog(context) {
-    showDialog(
-      context: context,
-      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          content: Consumer<CurrentBible>(
-            builder: (context, currentBible, child) {
-              return SizedBox(
-                width: 320,
-                height: 680,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 320,
-                      height: 320,
-                      child: GridView.count(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 2,
-                        children: List.generate(
-                          39,
-                          (title) {
-                            return ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      CustomThemeData.colorScheme.primary),
-                              onPressed: () {
-                                Navigator.pop(context);
+  _openSearchScreen(context) {
+    CurrentBible currentBible =
+        Provider.of<CurrentBible>(context, listen: false);
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const SearchScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
 
-                                currentBible.setPageWithCS(title, 1);
-                                VerseBuilder.pageController
-                                    .jumpToPage(currentBible.lbindex);
-                              },
-                              child: Text(
-                                curBookList[title],
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.white),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const Divider(
-                      thickness: 8,
-                    ),
-                    SizedBox(
-                      width: 320,
-                      height: 320,
-                      child: GridView.count(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 2,
-                        children: List.generate(
-                          27,
-                          (title) {
-                            return ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary),
-                              onPressed: () {
-                                Navigator.pop(context);
+          final tween = Tween(begin: begin, end: end);
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: curve,
+          );
 
-                                currentBible.setPageWithCS(39 + title, 1);
-                                VerseBuilder.pageController
-                                    .jumpToPage(currentBible.lbindex);
-                              },
-                              child: Text(
-                                curBookList[39 + title],
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.white),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  buildChapterDialog(context) {
-    showDialog(
-      context: context,
-      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          content: Consumer<CurrentBible>(
-            builder: (context, currentBible, child) {
-              return SizedBox(
-                width: 320,
-                height: 680,
-                child: GridView.count(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childAspectRatio: 2,
-                  children: List.generate(
-                    chapterList[currentBible.lbt],
-                    (chapter) {
-                      return ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary),
-                        onPressed: () {
-                          Navigator.pop(context);
-
-                          currentBible.setPageWithCS(
-                              currentBible.lbt, chapter + 1);
-                          VerseBuilder.pageController
-                              .jumpToPage(currentBible.lbindex);
-                        },
-                        child: Text(
-                          '${chapter + 1}',
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  buildTypeDialog(context) {
-    showDialog(
-      context: context,
-      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          content: Consumer<CurrentBible>(
-            builder: (context, currentBible, child) {
-              return SizedBox(
-                width: 320,
-                height: 320,
-                child: ListView.builder(
-                  itemCount: bookTypeList.length,
-                  itemBuilder: (context, index) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary),
-                      onPressed: () {
-                        Navigator.pop(context);
-
-                        currentBible.setBt(bookTypeList[index]);
-                        //print(currentBible.curBook[currentBible.lbindex][0][1]);
-                      },
-                      child: Text(
-                        bookTypeList[index],
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        );
-      },
+          return SlideTransition(
+            position: tween.animate(curvedAnimation),
+            child: child,
+          );
+        },
+      ),
     );
   }
 }

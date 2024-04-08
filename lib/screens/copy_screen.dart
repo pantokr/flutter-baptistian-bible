@@ -1,61 +1,54 @@
 import 'package:bible/main.dart';
 import 'package:bible/provider/list.dart';
 import 'package:bible/provider/provider.dart';
-import 'package:bible/widgets/verse_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:highlight_text/highlight_text.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class CopyScreen extends StatefulWidget {
-  final chapter;
-  final initialSec;
-  const CopyScreen({super.key, required this.chapter, this.initialSec});
+  final List chapter;
+  final List initialVerse;
+  const CopyScreen(
+      {super.key, required this.chapter, required this.initialVerse});
 
   @override
   State<CopyScreen> createState() => _CopyScreenState();
-
-  static openCopyScreen(context) {
-    CurrentBible currentBible =
-        Provider.of<CurrentBible>(context, listen: false);
-    currentBible.setAlternativeBibleMode();
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            CopyScreen(chapter: currentBible.curBook[currentBible.lbindex]),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 1.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-
-          final tween = Tween(begin: begin, end: end);
-          final curvedAnimation = CurvedAnimation(
-            parent: animation,
-            curve: curve,
-          );
-
-          return SlideTransition(
-            position: tween.animate(curvedAnimation),
-            child: child,
-          );
-        },
-      ),
-    );
-  }
 }
 
 class _CopyScreenState extends State<CopyScreen> {
   late final List<dynamic> chapter;
-  late final int initialSec;
+  late final List<dynamic> initialVerse;
 
   List selectedVerses = [];
   Color boxColor = Colors.black12;
+  AutoScrollController copyController = AutoScrollController();
 
   @override
   void initState() {
     chapter = widget.chapter;
-    initialSec = widget.initialSec ?? -1;
+    initialVerse = widget.initialVerse;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (initialVerse.isNotEmpty) {
+          copyController.scrollToIndex(initialVerse[2],
+              duration: const Duration(microseconds: 1000),
+              preferPosition: AutoScrollPosition.middle);
+
+          _selectBox(chapter[initialVerse[2]]);
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    copyController.dispose();
   }
 
   @override
@@ -76,36 +69,38 @@ class _CopyScreenState extends State<CopyScreen> {
         ),
         leading: IconButton(
             onPressed: () {
-              Provider.of<CurrentBible>(context, listen: false)
-                  .setAlternativeBibleMode();
               Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back_ios)),
       ),
-      body: Consumer<CurrentBible>(
-        builder: (context, currentBible, child) {
-          return ListView.builder(
-            itemCount: chapter.length,
-            itemBuilder: (context, sec) {
-              return _buildContent(chapter[sec]);
-            },
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
+        child: ListView.builder(
+          controller: copyController,
+          itemCount: chapter.length,
+          itemBuilder: (context, verseIndex) {
+            return AutoScrollTag(
+                key: ValueKey(verseIndex),
+                controller: copyController,
+                index: verseIndex,
+                child: buildSelectableRawContent(chapter[verseIndex]));
+          },
+        ),
       ),
       bottomNavigationBar: buildBottomAppBar(),
     );
   }
 
-  Widget _buildContent(List<dynamic> sec) {
+  buildSelectableRawContent(List<dynamic> verse) {
     return InkWell(
       onTap: () {
-        _selectBox(sec);
+        _selectBox(verse);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         child: Container(
           decoration: BoxDecoration(
-            color: selectedVerses.contains(sec)
+            color: selectedVerses.contains(verse)
                 ? boxColor
                 : CustomThemeData.colorScheme.background,
             borderRadius: BorderRadius.circular(8),
@@ -116,23 +111,14 @@ class _CopyScreenState extends State<CopyScreen> {
               SizedBox(
                   width: 32,
                   child: Text(
-                    sec[0].toString(),
+                    verse[3].toString(),
                     textDirection: TextDirection.rtl,
                     style: const TextStyle(fontSize: 16),
                   )),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: RichText(
-                    text: TextSpan(
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: sec[1].toString(),
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black)),
-                      ],
-                    ),
-                  ),
+                  child: buildWrappedString(verse[4]),
                 ),
               ),
             ],
@@ -142,11 +128,32 @@ class _CopyScreenState extends State<CopyScreen> {
     );
   }
 
-  _selectBox(sec) {
-    if (selectedVerses.contains(sec)) {
-      selectedVerses.remove(sec);
+  buildWrappedString(String str) {
+    List<String> parsedSec = str.trim().split(' ');
+    if (parsedSec.last.isBlank!) {
+      parsedSec.removeLast();
+    }
+
+    return Wrap(
+      children: parsedSec
+          .map<Widget>(
+            (text) => Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: Text(
+                text,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  _selectBox(verse) {
+    if (selectedVerses.contains(verse)) {
+      selectedVerses.remove(verse);
     } else {
-      selectedVerses.add(sec);
+      selectedVerses.add(verse);
       selectedVerses.sort(
         (a, b) {
           return chapter.indexOf(a) < chapter.indexOf(b) ? -1 : 1;
@@ -171,34 +178,40 @@ class _CopyScreenState extends State<CopyScreen> {
   }
 
   _buildCopyButton() {
-    return SizedBox(
-      width: 64,
-      height: 64,
-      child: ElevatedButton(
-        onPressed: () {
-          if (selectedVerses.isEmpty) {
-            showToast('선택된 절이 없습니다');
-          } else {
-            String title = '${curBookList[chapter[0][2]]} ${chapter[0][3]}\n\n';
-            String body = '';
-            for (var text in selectedVerses) {
-              String line = '${text[0]} ${text[1]}\n';
-              body += line;
-            }
-            String total = title + body;
-            Clipboard.setData(ClipboardData(text: total));
-            showToast('클립보드에 복사되었습니다');
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          elevation: 8,
-          shadowColor: Colors.black,
-          backgroundColor: CustomThemeData.colorScheme.background,
-          shape: const CircleBorder(side: BorderSide(color: Colors.black26)),
-        ),
-        child: Icon(Icons.copy,
-            size: 32, color: CustomThemeData.colorScheme.primary),
-      ),
+    return Consumer<CurrentBible>(
+      builder: (context, currentBible, child) {
+        return SizedBox(
+          width: 64,
+          height: 64,
+          child: ElevatedButton(
+            onPressed: () {
+              if (selectedVerses.isEmpty) {
+                showToast('선택된 절이 없습니다');
+              } else {
+                String title =
+                    '${currentBible.curTitleList[chapter[0][0]]} ${chapter[0][1]}\n\n';
+                String body = '';
+                for (var text in selectedVerses) {
+                  String line = '${text[3]} ${text[4]}\n';
+                  body += line;
+                }
+                String total = title + body;
+                Clipboard.setData(ClipboardData(text: total));
+                //showToast('클립보드에 복사되었습니다');
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              elevation: 8,
+              shadowColor: Colors.black,
+              backgroundColor: CustomThemeData.colorScheme.background,
+              shape:
+                  const CircleBorder(side: BorderSide(color: Colors.black26)),
+            ),
+            child: Icon(Icons.copy,
+                size: 32, color: CustomThemeData.colorScheme.primary),
+          ),
+        );
+      },
     );
   }
 
@@ -209,13 +222,13 @@ class _CopyScreenState extends State<CopyScreen> {
       child: ElevatedButton(
         onPressed: () {
           if (selectedVerses.length == chapter.length) {
-            for (var sector in chapter) {
-              _selectBox(sector);
+            for (var versetor in chapter) {
+              _selectBox(versetor);
             }
           } else {
             selectedVerses.clear();
-            for (var sector in chapter) {
-              _selectBox(sector);
+            for (var versetor in chapter) {
+              _selectBox(versetor);
             }
           }
         },
@@ -260,4 +273,33 @@ class _CopyScreenState extends State<CopyScreen> {
       fontSize: 20.0,
     );
   }
+}
+
+openCopyScreen(context, initialVerse) {
+  CurrentBible currentBible = Provider.of<CurrentBible>(context, listen: false);
+  Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => CopyScreen(
+        chapter: currentBible.curRawBook[currentBible.lastBibleIndex],
+        initialVerse: initialVerse,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(-1.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        final tween = Tween(begin: begin, end: end);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
+
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
+      },
+    ),
+  );
 }

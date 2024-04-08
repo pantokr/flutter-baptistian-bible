@@ -1,6 +1,7 @@
-List<String> bookTypeList = ['개역한글', '개역개정'];
+const List<String> bookTypeList = ['개역한글', '개역개정'];
 
-List<String> bookListKor = [
+//Korean
+const List<String> bookListKor = [
   '창세기',
   '출애굽기',
   '레위기',
@@ -69,7 +70,77 @@ List<String> bookListKor = [
   '요한계시록'
 ];
 
-List<String> bookListEng = [
+const List<String> bookListKorShort = [
+  '창',
+  '출',
+  '레',
+  '민',
+  '신',
+  '여수',
+  '삿',
+  '룻',
+  '삼상',
+  '삼하',
+  '왕상',
+  '왕하',
+  '대상',
+  '대하',
+  '스',
+  '느',
+  '에',
+  '욥',
+  '시',
+  '잠',
+  '전',
+  '아',
+  '사',
+  '렘',
+  '애',
+  '겔',
+  '단',
+  '호',
+  '욜',
+  '암',
+  '옵',
+  '욘',
+  '미',
+  '나',
+  '합',
+  '습',
+  '학',
+  '슥',
+  '말',
+  '마',
+  '막',
+  '눅',
+  '요',
+  '행',
+  '롬',
+  '고전',
+  '고후',
+  '갈',
+  '엡',
+  '빌',
+  '골',
+  '살전',
+  '살후',
+  '담전',
+  '딤후',
+  '딛',
+  '몬',
+  '히',
+  '약',
+  '벧전',
+  '벧후',
+  '요일요1',
+  '요이요2',
+  '요삼요3',
+  '유',
+  '계'
+];
+
+//English
+const List<String> bookListEngShort = [
   'Genesis',
   '출애굽기',
   '레위기',
@@ -138,9 +209,7 @@ List<String> bookListEng = [
   '요한계시록'
 ];
 
-List<String> curBookList = [];
-
-List<int> chapterList = [
+const List<int> chapterLengthList = [
   50,
   40,
   27,
@@ -208,7 +277,3 @@ List<int> chapterList = [
   1,
   22
 ];
-
-List<dynamic> curOriginalBook = [];
-
-List<dynamic> curRawBook = [];

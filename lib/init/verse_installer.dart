@@ -1,17 +1,17 @@
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-List<List<List<dynamic>>> hanOriginalList = [];
-List<List<List<dynamic>>> hanRawList = [];
-List<List<List<dynamic>>> gaeOriginalList = [];
-List<List<List<dynamic>>> gaeRawList = [];
+List<dynamic> hanOriginalList = [];
+List<dynamic> hanRawList = [];
+List<dynamic> gaeOriginalList = [];
+List<dynamic> gaeRawList = [];
 
 readBibleFileHAN() async {
   //han
   final originalData = await rootBundle.loadString("assets/HAN_original.csv");
   final rawData = await rootBundle.loadString("assets/HAN_raw.csv");
-  var orgList = const CsvToListConverter().convert(originalData);
-  var rawList = const CsvToListConverter().convert(rawData);
+  final orgList = const CsvToListConverter().convert(originalData);
+  final rawList = const CsvToListConverter().convert(rawData);
 
   hanOriginalList = formatBible(orgList);
   hanRawList = formatBible(rawList);
@@ -21,25 +21,27 @@ readBibleFileGAE() async {
   //gae
   final originalData = await rootBundle.loadString("assets/GAE_original.csv");
   final rawData = await rootBundle.loadString("assets/GAE_raw.csv");
-  var orgList = const CsvToListConverter().convert(originalData);
-  var rawList = const CsvToListConverter().convert(rawData);
+  final orgList = const CsvToListConverter().convert(originalData);
+  final rawList = const CsvToListConverter().convert(rawData);
 
   gaeOriginalList = formatBible(orgList);
   gaeRawList = formatBible(rawList);
 }
 
-List<List<List<dynamic>>> formatBible(list) {
-  List<List<List<dynamic>>> resList = [];
-
-  List<List<dynamic>> tList = [];
+List<dynamic> formatBible(List list) {
+  List<dynamic> resList = [];
+  List<List<dynamic>> chapterList = [];
   for (var l in list) {
-    String indstr = l[0].toString();
-    if ((indstr == '1' || indstr == '1-2' || indstr == '1-3') && l != list[0]) {
-      resList.add(tList);
-      tList = [];
+    int index = l[2];
+    if (index == 0 && l != list.first) {
+      // if verse number is 0
+      resList.add(chapterList);
+      chapterList = [];
     }
-    tList.add(l);
+
+    chapterList.add(l);
   }
 
+  resList.add(chapterList);
   return resList;
 }

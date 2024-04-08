@@ -2,79 +2,98 @@ import 'package:bible/init/preference_manager.dart';
 import 'package:bible/init/verse_installer.dart';
 import 'package:bible/provider/list.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:bible/init/preference_manager.dart';
 
 class CurrentBible with ChangeNotifier {
   CurrentBible() {
-    _bt = pref.getString('bt')!;
-    _lbt = pref.getInt('lbt')!;
-    _lbc = pref.getInt('lbc')!;
-    _lbindex = pref.getInt('lbindex')!;
+    _lastBibleVersion = pref.getString('lastBibleVersion')!;
+    _lastBibleTitle = pref.getInt('lastBibleTitle')!;
+    _lastBibleChapter = pref.getInt('lastBibleChapter')!;
+    _lastBibleVerse = pref.getInt('lastBibleVerse')!;
+    _lastBibleIndex = pref.getInt('lastBibleIndex')!;
 
-    arrangeType(_bt);
+    arrangeType(_lastBibleVersion);
   }
 
-  List<dynamic> _curBook = [];
-  List<dynamic> get curBook => _curBook;
+  List<dynamic> _curOriginalBook = [];
+  List<dynamic> get curOriginalBook => _curOriginalBook;
 
-  String _bt = '';
-  String get bt => _bt;
+  List<dynamic> _curRawBook = [];
+  List<dynamic> get curRawBook => _curRawBook;
 
-  int _lbt = 0;
-  int get lbt => _lbt;
+  List<dynamic> _curTitleList = [];
+  List<dynamic> get curTitleList => _curTitleList;
 
-  int _lbc = 1;
-  int get lbc => _lbc;
+  String _lastBibleVersion = '';
+  String get lastBibleVersion => _lastBibleVersion;
 
-  int _lbindex = 0;
-  int get lbindex => _lbindex;
+  int _lastBibleTitle = 0;
+  int get lastBibleTitle => _lastBibleTitle;
 
-  void setBt(str) {
-    _bt = str;
-    pref.setString('bt', str);
+  int _lastBibleChapter = 0;
+  int get lastBibleChapter => _lastBibleChapter;
+
+  int _lastBibleVerse = 0;
+  int get lastBibleVerse => _lastBibleVerse;
+
+  int _lastBibleIndex = 0;
+  int get lastBibleIndex => _lastBibleIndex;
+
+  void setBibleVersion(str) {
+    _lastBibleVersion = str;
+    pref.setString('lastBibleVersion', str);
     arrangeType(str);
     notifyListeners();
   }
 
-  void setLbt(index) {
-    _lbt = index;
-    pref.setInt('lbt', index);
+  void setLastBibleTitle(titleIndex) {
+    _lastBibleTitle = titleIndex;
+    pref.setInt('lastBibleTitle', titleIndex);
     notifyListeners();
   }
 
-  void setLbc(index) {
-    _lbc = index;
-    pref.setInt('lbc', index);
+  void setLastBibleChapter(chapterIndex) {
+    _lastBibleChapter = chapterIndex;
+    pref.setInt('lastBibleChapter', chapterIndex);
     notifyListeners();
   }
 
-  void setLbindex(index) {
-    _lbindex = index;
-    pref.setInt('lbindex', index);
+  void setLastBibleVerse(verseIndex) {
+    _lastBibleVerse = verseIndex;
+    pref.setInt('lastBibleVerse', verseIndex);
     notifyListeners();
   }
 
-  void setPage(index) {
-    var firstSec = curBook[index][0];
-    var bt = firstSec[2];
-    var bc = firstSec[3];
-
-    setLbt(bt);
-    setLbc(bc);
-    setLbindex(index);
+  void setLastbibleIndex(totalIndex) {
+    _lastBibleIndex = totalIndex;
+    pref.setInt('lastBibleIndex', totalIndex);
     notifyListeners();
   }
 
-  void setPageWithCS(int chp, int sec) {
-    setLbt(chp);
-    setLbc(sec);
+  void setPage(pageIndex) {
+    var firstSec = curOriginalBook[pageIndex][0];
+    var bibleTitle = firstSec[0];
+    var bibleChapter = firstSec[1];
+
+    setLastBibleTitle(bibleTitle);
+    setLastBibleChapter(bibleChapter);
+    setLastbibleIndex(pageIndex);
+
+    // print('$_lastBibleTitle $lastBibleChapter $lastBibleIndex');
+    notifyListeners();
+  }
+
+  void setPageWithTS(int titleIndex, int chapterIndex) {
+    setLastBibleTitle(titleIndex);
+    setLastBibleChapter(chapterIndex);
+
     int sum = 0;
-    for (int i = 0; i < chp; i++) {
-      sum += chapterList[i];
+    for (int i = 0; i < titleIndex; i++) {
+      sum += chapterLengthList[i];
     }
-    sum += sec - 1;
-    setLbindex(sum);
+    sum += chapterIndex;
+
+    setLastbibleIndex(sum);
+    print('$titleIndex $chapterIndex $sum');
     notifyListeners();
   }
 
@@ -83,29 +102,21 @@ class CurrentBible with ChangeNotifier {
       _han();
     } else if (type == '개역개정') {
       _gae();
+    } else {
+      _han();
     }
     notifyListeners();
   }
 
-  void setAlternativeBibleMode() {
-    _curBook =
-        listEquals(_curBook, curOriginalBook) ? curRawBook : curOriginalBook;
-    notifyListeners();
-  }
-
   void _han() {
-    curOriginalBook = hanOriginalList;
-    curRawBook = hanRawList;
-    _curBook = curOriginalBook;
-
-    curBookList = bookListKor;
+    _curOriginalBook = hanOriginalList;
+    _curRawBook = hanRawList;
+    _curTitleList = bookListKor;
   }
 
   void _gae() {
-    curOriginalBook = gaeOriginalList;
-    curRawBook = gaeRawList;
-    _curBook = curOriginalBook;
-
-    curBookList = bookListKor;
+    _curOriginalBook = gaeOriginalList;
+    _curRawBook = gaeRawList;
+    _curTitleList = bookListKor;
   }
 }
