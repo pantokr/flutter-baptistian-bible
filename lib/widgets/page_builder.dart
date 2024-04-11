@@ -1,29 +1,24 @@
-import 'package:bible/main.dart';
 import 'package:bible/provider/provider.dart';
 import 'package:bible/widgets/list_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PageBuilder extends StatefulWidget {
+class PageBuilder extends StatelessWidget {
   const PageBuilder({super.key});
 
-  @override
-  State<PageBuilder> createState() => _PageBuilderState();
-}
-
-class _PageBuilderState extends State<PageBuilder> {
-  Color boxColor = CustomThemeData.colorScheme.background;
-  PageController pageController = PageController(initialPage: 0);
+  static PageController pageController = PageController();
+  static jumpToPage(page) {
+    pageController.jumpToPage(page);
+  }
 
   @override
   Widget build(BuildContext context) {
-    pageController = PageController(
-        initialPage: Provider.of<CurrentBible>(context, listen: false)
-            .lastBibleIndex); //Page 컨트롤을 위한 PageController 선언 시작 페이지 0
-
     return Consumer<CurrentBible>(
       builder: (context, currentBible, child) {
+        pageController =
+            PageController(initialPage: currentBible.lastBibleIndex);
         return PageView.builder(
+          // preloadPagesCount: 5,
           physics: const CustomPageViewScrollPhysics(),
           controller: pageController,
           itemCount: currentBible.curOriginalBook.length,
@@ -31,7 +26,10 @@ class _PageBuilderState extends State<PageBuilder> {
             currentBible.setPage(newPageIndex);
           },
           itemBuilder: (context, chapterIndex) {
-            return const ListBuilder();
+            return ListBuilder(
+              chapterIndex: chapterIndex,
+              copyMode: false,
+            );
           },
         );
       },

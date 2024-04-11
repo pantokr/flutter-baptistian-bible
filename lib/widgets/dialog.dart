@@ -1,7 +1,7 @@
-import 'package:bible/main.dart';
+import 'package:bible/init/preference_manager.dart';
 import 'package:bible/provider/list.dart';
 import 'package:bible/provider/provider.dart';
-import 'package:bible/widgets/page_builder.dart';
+import 'package:bible/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,31 +11,38 @@ showTypeSetterDialog(context) {
     //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
     builder: (context) {
       return Dialog(
-        // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+        backgroundColor: CustomThemeData.color1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         child: Consumer<CurrentBible>(
           builder: (context, currentBible, child) {
             return SizedBox(
               width: 320,
               height: 320,
-              child: ListView.builder(
-                itemCount: bookTypeList.length,
-                itemBuilder: (context, index) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary),
-                    onPressed: () {
-                      Navigator.pop(context);
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(60.0),
+                  child: ListView.builder(
+                    itemCount: bookTypeList.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        onPressed: () {
+                          Navigator.pop(context);
 
-                      currentBible.setBibleVersion(bookTypeList[index]);
-                      //print(currentBible.curBook[currentBible.lbindex][0][1]);
+                          currentBible.setBibleVersion(bookTypeList[index]);
+                          //print(currentBible.curBook[currentBible.lbindex][0][1]);
+                        },
+                        child: Text(
+                          bookTypeList[index],
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      );
                     },
-                    child: Text(
-                      bookTypeList[index],
-                      style: const TextStyle(fontSize: 12, color: Colors.white),
-                    ),
-                  );
-                },
+                  ),
+                ),
               ),
             );
           },
@@ -51,7 +58,7 @@ showTitleDialog(context, curBookList) {
     //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
     builder: (context) {
       return Dialog(
-        // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+        backgroundColor: CustomThemeData.color1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         child: Consumer<CurrentBible>(
           builder: (context, currentBible, child) {
@@ -62,13 +69,15 @@ showTitleDialog(context, curBookList) {
                 height: 640,
                 child: Column(
                   children: [
-                    const TabBar(tabs: [
+                    TabBar(tabs: [
                       SizedBox(
                         height: 64,
                         child: Center(
                           child: Text(
                             'Old',
-                            style: TextStyle(fontSize: 32),
+                            style: TextStyle(
+                                fontSize: 32,
+                                color: CustomThemeData.colorScheme.primary),
                           ),
                         ),
                       ),
@@ -77,7 +86,9 @@ showTitleDialog(context, curBookList) {
                         child: Center(
                           child: Text(
                             'New',
-                            style: TextStyle(fontSize: 32),
+                            style: TextStyle(
+                                fontSize: 32,
+                                color: CustomThemeData.colorScheme.primary),
                           ),
                         ),
                       ),
@@ -88,7 +99,7 @@ showTitleDialog(context, curBookList) {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: GridView.count(
-                              crossAxisCount: 4,
+                              crossAxisCount: 3,
                               mainAxisSpacing: 8,
                               crossAxisSpacing: 8,
                               childAspectRatio: 1.6,
@@ -105,10 +116,12 @@ showTitleDialog(context, curBookList) {
 
                                       currentBible.setPageWithTS(title, 0);
                                     },
-                                    child: Text(
-                                      curBookList[title],
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.white),
+                                    child: Center(
+                                      child: Text(
+                                        curBookList[title],
+                                        style: const TextStyle(
+                                            fontSize: 10, color: Colors.white),
+                                      ),
                                     ),
                                   );
                                 },
@@ -118,7 +131,7 @@ showTitleDialog(context, curBookList) {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: GridView.count(
-                              crossAxisCount: 4,
+                              crossAxisCount: 3,
                               mainAxisSpacing: 8,
                               crossAxisSpacing: 8,
                               childAspectRatio: 1.6,
@@ -135,10 +148,12 @@ showTitleDialog(context, curBookList) {
 
                                       currentBible.setPageWithTS(39 + title, 0);
                                     },
-                                    child: Text(
-                                      curBookList[39 + title],
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.white),
+                                    child: Center(
+                                      child: Text(
+                                        curBookList[39 + title],
+                                        style: const TextStyle(
+                                            fontSize: 10, color: Colors.white),
+                                      ),
                                     ),
                                   );
                                 },
@@ -162,10 +177,9 @@ showTitleDialog(context, curBookList) {
 showChapterDialog(context) {
   showDialog(
     context: context,
-    //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
     builder: (context) {
       return Dialog(
-        // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+        backgroundColor: CustomThemeData.color1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         child: Consumer<CurrentBible>(
           builder: (context, currentBible, child) {
@@ -175,7 +189,7 @@ showChapterDialog(context) {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: GridView.count(
-                  crossAxisCount: 4,
+                  crossAxisCount: 3,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   childAspectRatio: 1.6,
@@ -187,15 +201,15 @@ showChapterDialog(context) {
                             backgroundColor:
                                 Theme.of(context).colorScheme.primary),
                         onPressed: () {
-                          Navigator.pop(context);
-
+                          //print('${currentBible.lastBibleTitle} $chapter');
                           currentBible.setPageWithTS(
                               currentBible.lastBibleTitle, chapter);
+                          Navigator.pop(context);
                         },
                         child: Text(
                           '${chapter + 1}',
                           style: const TextStyle(
-                              fontSize: 12, color: Colors.white),
+                              fontSize: 10, color: Colors.white),
                         ),
                       );
                     },
@@ -215,11 +229,59 @@ showDescriptionDialog(context, String description) {
     context: context,
     builder: (context) {
       return AlertDialog(
+        backgroundColor: CustomThemeData.color1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
         content: Text(
           description,
+        ),
+      );
+    },
+  );
+}
+
+showChangeThemeDialog(context) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: CustomThemeData.color1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: SizedBox(
+          width: 320,
+          height: 320,
+          child: Padding(
+            padding: const EdgeInsets.all(60.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 160,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      pref.setBool('darkMode', !CustomThemeMode.current.value);
+                      Future.delayed(
+                        const Duration(milliseconds: 500),
+                        () {
+                          CustomThemeMode.change();
+                        },
+                      );
+                    },
+                    child: const Text(
+                      '다크모드 적용/해제',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       );
     },

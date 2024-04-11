@@ -1,11 +1,9 @@
-import 'package:bible/main.dart';
-import 'package:bible/provider/list.dart';
 import 'package:bible/provider/provider.dart';
+import 'package:bible/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
-import 'package:highlight_text/highlight_text.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -24,13 +22,14 @@ class _CopyScreenState extends State<CopyScreen> {
   late final List<dynamic> initialVerse;
 
   List selectedVerses = [];
-  Color boxColor = Colors.black12;
+  Color boxColor = Colors.grey;
   AutoScrollController copyController = AutoScrollController();
 
   @override
   void initState() {
     chapter = widget.chapter;
     initialVerse = widget.initialVerse;
+    // ListBuilder.scrollToVerse(initialVerse);
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
         if (initialVerse.isNotEmpty) {
@@ -87,6 +86,10 @@ class _CopyScreenState extends State<CopyScreen> {
           },
         ),
       ),
+      // body: ListBuilder(
+      //   chapterIndex: chapter[0][1],
+      //   copyMode: true,
+      // ),
       bottomNavigationBar: buildBottomAppBar(),
     );
   }
@@ -102,20 +105,21 @@ class _CopyScreenState extends State<CopyScreen> {
           decoration: BoxDecoration(
             color: selectedVerses.contains(verse)
                 ? boxColor
-                : CustomThemeData.colorScheme.background,
+                : CustomThemeData.backgroundColor,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                  width: 32,
+                  width: 40,
                   child: Text(
                     verse[3].toString(),
                     textDirection: TextDirection.rtl,
                     style: const TextStyle(fontSize: 16),
                   )),
-              Flexible(
+              SizedBox(
+                width: 320,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: buildWrappedString(verse[4]),
@@ -130,9 +134,6 @@ class _CopyScreenState extends State<CopyScreen> {
 
   buildWrappedString(String str) {
     List<String> parsedSec = str.trim().split(' ');
-    if (parsedSec.last.isBlank!) {
-      parsedSec.removeLast();
-    }
 
     return Wrap(
       children: parsedSec
@@ -197,13 +198,13 @@ class _CopyScreenState extends State<CopyScreen> {
                 }
                 String total = title + body;
                 Clipboard.setData(ClipboardData(text: total));
-                //showToast('클립보드에 복사되었습니다');
+                showToast('말씀이 복사되었습니다');
               }
             },
             style: ElevatedButton.styleFrom(
               elevation: 8,
               shadowColor: Colors.black,
-              backgroundColor: CustomThemeData.colorScheme.background,
+              backgroundColor: CustomThemeData.color1,
               shape:
                   const CircleBorder(side: BorderSide(color: Colors.black26)),
             ),
@@ -222,20 +223,20 @@ class _CopyScreenState extends State<CopyScreen> {
       child: ElevatedButton(
         onPressed: () {
           if (selectedVerses.length == chapter.length) {
-            for (var versetor in chapter) {
-              _selectBox(versetor);
+            for (var verse in chapter) {
+              _selectBox(verse);
             }
           } else {
             selectedVerses.clear();
-            for (var versetor in chapter) {
-              _selectBox(versetor);
+            for (var verse in chapter) {
+              _selectBox(verse);
             }
           }
         },
         style: ElevatedButton.styleFrom(
           elevation: 8,
           shadowColor: Colors.black,
-          backgroundColor: CustomThemeData.colorScheme.background,
+          backgroundColor: CustomThemeData.color1,
           shape: const CircleBorder(side: BorderSide(color: Colors.black26)),
         ),
         child: Icon(Icons.select_all,
@@ -245,20 +246,39 @@ class _CopyScreenState extends State<CopyScreen> {
   }
 
   _buildAppendMemoButton() {
-    return SizedBox(
-      width: 64,
-      height: 64,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          elevation: 8,
-          shadowColor: Colors.black,
-          backgroundColor: CustomThemeData.colorScheme.background,
-          shape: const CircleBorder(side: BorderSide(color: Colors.black26)),
-        ),
-        child: Icon(Icons.note_add,
-            size: 32, color: CustomThemeData.colorScheme.primary),
-      ),
+    return Consumer<CurrentBible>(
+      builder: (context, currentBible, child) {
+        return SizedBox(
+          width: 64,
+          height: 64,
+          child: ElevatedButton(
+            onPressed: () {
+              if (selectedVerses.isEmpty) {
+                showToast('선택된 절이 없습니다');
+              } else {
+                String title = '${currentBible.curRawBook.indexOf(chapter)}';
+                String body = '';
+                for (var text in selectedVerses) {
+                  String line = ':${text[3]}';
+                  body += line;
+                }
+                String total = title + body;
+                currentBible.addMemoList(total);
+                showToast('말씀이 저장되었습니다');
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              elevation: 8,
+              shadowColor: Colors.black,
+              backgroundColor: CustomThemeData.color1,
+              shape:
+                  const CircleBorder(side: BorderSide(color: Colors.black26)),
+            ),
+            child: Icon(Icons.note_add,
+                size: 32, color: CustomThemeData.colorScheme.primary),
+          ),
+        );
+      },
     );
   }
 

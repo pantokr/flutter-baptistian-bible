@@ -11,5 +11,7 @@ class Init {
     await getPref();
     await readBibleFileHAN();
     await readBibleFileGAE();
+    await readBibleFileKJV();
+    //await readBibleFileCEV();
   }
 }

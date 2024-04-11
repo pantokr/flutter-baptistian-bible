@@ -1,12 +1,8 @@
-import 'package:bible/main.dart';
-import 'package:bible/provider/list.dart';
 import 'package:bible/provider/provider.dart';
-import 'package:bible/screens/verse_screen.dart';
-import 'package:bible/widgets/list_builder.dart';
-import 'package:bible/widgets/page_builder.dart';
+import 'package:bible/widgets/search_history_builder.dart';
+import 'package:bible/widgets/search_page_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
@@ -18,9 +14,15 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  late CurrentBible currentBible;
+
   String toSearch = '';
-  List<Widget> searchList = [];
-  AutoScrollController searchController = AutoScrollController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    currentBible = Provider.of<CurrentBible>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,13 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                 ),
-                toSearch.length < 2 ? buildHistory() : buildSearchList(toSearch)
+
+                toSearch.length < 2
+                    ? const SearchHistoryBuilder()
+                    : SearchPageBuilder(
+                        toSearch: toSearch,
+                      )
+                // :SearchPageBuilder(toSearch:  toSearch)
               ],
             ),
           ),
@@ -71,125 +79,30 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
+}
 
-  buildHistory() {
-    return const Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 32),
-          child: Text(
-            '검색 결과를 2자 이상 입력해 주세요',
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
-      ],
-    );
-  }
+openSearchScreen(context) {
+  Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const SearchScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
 
-  buildSearchList(toSearch) {
-    _createSearchListView(toSearch);
-    return searchList.isEmpty
-        ? const Padding(
-            padding: EdgeInsets.symmetric(vertical: 32),
-            child: Text('검색 결과가 없습니다.'),
-          )
-        : SizedBox(
-            width: double.infinity,
-            child: ListView.builder(
-              shrinkWrap: true,
-              controller: searchController,
-              itemCount: searchList.length,
-              itemBuilder: (context, searchIndex) {
-                return searchList[searchIndex];
-              },
-            ),
-          );
-  }
+        final tween = Tween(begin: begin, end: end);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
 
-  _createSearchListView(String toSearch) {
-    searchList.clear();
-    final rawBook =
-        Provider.of<CurrentBible>(context, listen: false).curRawBook;
-    for (List<dynamic> chapterIndex in rawBook) {
-      for (var verse in chapterIndex) {
-        String thisverse = verse[4].toString().trim();
-        String thisTitleName = '${bookListKor[verse[0]]} ';
-        String thisShortTitleName = '${bookListKorShort[verse[0]]} ';
-        String thischapterIndexverseName = '${verse[1] + 1}:${verse[3]}';
-        String defaultName = '${verse[1] + 1}장 ${verse[3]}절 ';
-        String toCompare =
-            thisTitleName + thisShortTitleName + defaultName + thisverse;
-        String showingTitle = thisTitleName + thischapterIndexverseName;
-
-        var toSearchSplitted = toSearch.split(' ');
-        var allEquals =
-            toSearchSplitted.every((element) => toCompare.contains(element));
-        if (allEquals) {
-          searchList.add(buildContentWithBookName(verse, showingTitle));
-        }
-      }
-    }
-  }
-
-  buildContentWithBookName(List<dynamic> verse, String title) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-        ),
-        _content(verse)
-      ],
-    );
-  }
-
-  _content(List<dynamic> verse) {
-    return InkWell(
-      onTap: () {
-        CurrentBible currentBible =
-            Provider.of<CurrentBible>(context, listen: false);
-
-        currentBible.setPageWithTS(verse[0], verse[1]);
-        Navigator.pop(context);
-
-        ListBuilder.verseController.scrollToIndex(verse[2]);
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        child: Container(
-          decoration: BoxDecoration(
-            color: CustomThemeData.colorScheme.background,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: buildWrappedString(verse[4]),
-          ),
-        ),
-      ),
-    );
-  }
-
-  buildWrappedString(String str) {
-    return Wrap(
-      children: str
-          .toString()
-          .trim()
-          .split(' ')
-          .map<Widget>(
-            (text) => Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Text(
-                text,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
+    ),
+  );
 }

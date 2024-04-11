@@ -1,37 +1,55 @@
-import 'package:bible/main.dart';
 import 'package:bible/provider/provider.dart';
 import 'package:bible/screens/copy_screen.dart';
+import 'package:bible/theme/theme.dart';
 import 'package:bible/widgets/dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter/widgets.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class ListBuilder extends StatefulWidget {
-  const ListBuilder({super.key});
-  static AutoScrollController verseController = AutoScrollController();
+  final int chapterIndex;
+  final bool copyMode;
+
+  const ListBuilder(
+      {super.key, required this.chapterIndex, required this.copyMode});
 
   @override
   State<ListBuilder> createState() => _ListBuilderState();
+
+  static AutoScrollController verseController = AutoScrollController();
+  static List verseHighlight = [];
+  static scrollToVerse(List verse) {
+    verseHighlight = verse;
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        verseController.scrollToIndex(verse[2],
+            preferPosition: AutoScrollPosition.middle,
+            duration: const Duration(milliseconds: 1000));
+      },
+    );
+  }
 }
 
 class _ListBuilderState extends State<ListBuilder> {
-  Color boxColor = CustomThemeData.colorScheme.background;
-
+  late int chapterIndex;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    chapterIndex = widget.chapterIndex;
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CurrentBible>(
       builder: (context, currentBible, child) {
-        int chapterIndex = currentBible.lastBibleIndex;
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: ListView.builder(
             shrinkWrap: true,
             controller: ListBuilder.verseController,
@@ -55,12 +73,17 @@ class _ListBuilderState extends State<ListBuilder> {
     context,
     List<dynamic> verse,
   ) {
-    String verseContent = verse[4];
-
     Map<String, HighlightedWord> toHighlight = _toHighlight(context, verse);
+    Color boxColor = CustomThemeData.backgroundColor;
+    if (ListBuilder.verseHighlight.isNotEmpty &&
+        listEquals(
+            ListBuilder.verseHighlight.sublist(0, 3), verse.sublist(0, 3))) {
+      boxColor = CustomThemeData.publicColor1;
+
+      ListBuilder.verseHighlight = [];
+    }
 
     return AutoScrollTag(
-      // key: ValueKey(verse[2]),
       key: UniqueKey(),
       controller: ListBuilder.verseController,
       index: verse[2],
@@ -72,24 +95,25 @@ class _ListBuilderState extends State<ListBuilder> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: Container(
             decoration: BoxDecoration(
-              color: CustomThemeData.colorScheme.background,
+              color: boxColor,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                    width: 32,
+                    width: 40,
                     child: Text(
                       verse[3].toString(),
                       textDirection: TextDirection.rtl,
                       style: const TextStyle(fontSize: 16),
                     )),
-                Flexible(
+                SizedBox(
+                  width: 320,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: buildWrappedStringWithHighlight(
-                        verseContent, toHighlight),
+                    child:
+                        buildWrappedStringWithHighlight(verse[4], toHighlight),
                   ),
                 ),
               ],
@@ -111,7 +135,7 @@ class _ListBuilderState extends State<ListBuilder> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        buildOriginalContent(context, verse)
+        buildOriginalContent(context, verse),
       ],
     );
   }
@@ -119,9 +143,6 @@ class _ListBuilderState extends State<ListBuilder> {
   buildWrappedStringWithHighlight(
       String str, Map<String, HighlightedWord> toHighlight) {
     List<String> parsedSec = str.trim().split(' ');
-    if (parsedSec.last.isBlank!) {
-      parsedSec.removeLast();
-    }
 
     return Wrap(
       children: parsedSec
@@ -136,7 +157,7 @@ class _ListBuilderState extends State<ListBuilder> {
   }
 
   _toHighlight(context, verse) {
-    final re = RegExp('[1]?[ㄱ-ㅎ0-9][)]');
+    final re = RegExp('[1]?[ㄱ-ㅎ0-9a-z][)]');
     var allMatches = re.allMatches(verse[4]);
 
     List<String> dscOrder = [];
@@ -159,13 +180,4 @@ class _ListBuilderState extends State<ListBuilder> {
         ),
     };
   }
-}
-
-initialScrollToVerse(int verseIndex) {
-  WidgetsBinding.instance.addPostFrameCallback(
-    (_) {
-      ListBuilder.verseController
-          .scrollToIndex(verseIndex, preferPosition: AutoScrollPosition.middle);
-    },
-  );
 }

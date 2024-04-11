@@ -1,8 +1,10 @@
-import 'package:bible/main.dart';
-import 'package:bible/provider/list.dart';
 import 'package:bible/provider/provider.dart';
 import 'package:bible/screens/copy_screen.dart';
+import 'package:bible/screens/dic_search_screen.dart';
+import 'package:bible/screens/map_screen.dart';
+import 'package:bible/screens/memo_screen.dart';
 import 'package:bible/screens/search_screen.dart';
+import 'package:bible/theme/theme.dart';
 import 'package:bible/widgets/dialog.dart';
 import 'package:bible/widgets/page_builder.dart';
 import 'package:flutter/material.dart';
@@ -17,33 +19,28 @@ class VerseScreen extends StatefulWidget {
 
 class _VerseScreenState extends State<VerseScreen> {
   final GlobalKey<ScaffoldState> _key = GlobalKey(); // Create a key
-  int _selectedOnMenu = 0;
 
   @override
   Widget build(BuildContext context) {
-    ThemeData themeData = Theme.of(context);
-    ColorScheme colorScheme = themeData.colorScheme;
-
     return Scaffold(
       key: _key,
       extendBody: true,
-      appBar: buildAppBar(_key, theme: themeData.appBarTheme),
-      endDrawer: buildDrawer(colorScheme),
-      backgroundColor: themeData.scaffoldBackgroundColor,
+      appBar: buildAppBar(_key),
+      endDrawer: buildDrawer(),
       body: const PageBuilder(),
       bottomNavigationBar: buildBottomAppBar(),
     );
   }
 
-  Widget buildDrawer(ColorScheme colorScheme) {
+  Widget buildDrawer() {
     return Drawer(
-      backgroundColor: colorScheme.background,
+      backgroundColor: CustomThemeData.color1,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: colorScheme.primary,
+              color: CustomThemeData.colorScheme.primary,
             ),
             child: const Center(
               child: Text(
@@ -52,44 +49,73 @@ class _VerseScreenState extends State<VerseScreen> {
               ),
             ),
           ),
-          buildMenuListTile("인명 사전 (미완)", 0),
-          buildMenuListTile("지명 사전 (미완)", 1),
-          buildMenuListTile("지도 (미완)", 2),
-          buildMenuListTile("단위 (미완)", 3),
+          buildMenuListTile("사전", 0),
+          buildMenuListTile("지도", 1),
+          //buildMenuListTile("단위 (미완)", 2),
           const Divider(
             thickness: 4,
           ),
-          buildMenuListTile("화면 설정", 4),
+          buildMenuListTile("저장된 말씀", 2),
+          buildMenuListTile("화면 설정", 3),
+          buildMenuListTile("번역본 설정", 4),
         ],
       ),
     );
-  }
-
-  _onItemTapped(int index) {
-    setState(() {
-      _selectedOnMenu = index;
-    });
   }
 
   buildMenuListTile(String content, int number) {
     return ListTile(
       title: Text(
         content,
-        style: const TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 16, color: CustomThemeData.textColor),
       ),
-      selected: _selectedOnMenu == number,
       onTap: () {
-        // Update the state of the app
-        _onItemTapped(number);
-        // Then close the drawer
+        _key.currentState?.closeEndDrawer();
+        if (number == 0) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const DicSearchScreen();
+              },
+            ),
+          );
+        }
+        if (number == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const MapScreen();
+              },
+            ),
+          );
+        }
+        if (number == 2) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const MemoScreen();
+              },
+            ),
+          );
+        }
+        if (number == 3) {
+          showChangeThemeDialog(context);
+        }
+        if (number == 4) {
+          showTypeSetterDialog(context);
+        }
       },
     );
   }
 
-  buildAppBar(key, {required AppBarTheme theme}) {
+  buildAppBar(
+    key,
+  ) {
     return AppBar(
       centerTitle: true,
-      backgroundColor: theme.backgroundColor,
       title: Consumer<CurrentBible>(
         builder: (context, currentBible, child) {
           return Padding(
@@ -109,7 +135,8 @@ class _VerseScreenState extends State<VerseScreen> {
                         border:
                             Border(bottom: BorderSide(color: Colors.white))),
                     child: Text(
-                      bookListKor[currentBible.lastBibleTitle].toString(),
+                      currentBible.curTitleList[currentBible.lastBibleTitle]
+                          .toString(),
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -175,7 +202,7 @@ class _VerseScreenState extends State<VerseScreen> {
               style: ElevatedButton.styleFrom(
                 elevation: 8,
                 shadowColor: Colors.black,
-                backgroundColor: CustomThemeData.colorScheme.background,
+                backgroundColor: CustomThemeData.color1,
                 shape:
                     const CircleBorder(side: BorderSide(color: Colors.black26)),
               ),
@@ -188,12 +215,12 @@ class _VerseScreenState extends State<VerseScreen> {
             height: 64,
             child: ElevatedButton(
               onPressed: () {
-                _openSearchScreen(context);
+                openSearchScreen(context);
               },
               style: ElevatedButton.styleFrom(
                 elevation: 8,
                 shadowColor: Colors.black,
-                backgroundColor: CustomThemeData.colorScheme.background,
+                backgroundColor: CustomThemeData.color1,
                 shape:
                     const CircleBorder(side: BorderSide(color: Colors.black26)),
               ),
@@ -202,34 +229,6 @@ class _VerseScreenState extends State<VerseScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  _openSearchScreen(context) {
-    CurrentBible currentBible =
-        Provider.of<CurrentBible>(context, listen: false);
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const SearchScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 1.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-
-          final tween = Tween(begin: begin, end: end);
-          final curvedAnimation = CurvedAnimation(
-            parent: animation,
-            curve: curve,
-          );
-
-          return SlideTransition(
-            position: tween.animate(curvedAnimation),
-            child: child,
-          );
-        },
       ),
     );
   }
