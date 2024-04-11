@@ -34,7 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '검색하기',
+              '검색',
               style: TextStyle(color: Colors.white),
             ),
           ],

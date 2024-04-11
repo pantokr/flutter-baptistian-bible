@@ -2,6 +2,7 @@ import 'package:bible/provider/provider.dart';
 import 'package:bible/screens/copy_screen.dart';
 import 'package:bible/theme/theme.dart';
 import 'package:bible/widgets/dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -48,21 +49,23 @@ class _ListBuilderState extends State<ListBuilder> {
   Widget build(BuildContext context) {
     return Consumer<CurrentBible>(
       builder: (context, currentBible, child) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: ListView.builder(
-            shrinkWrap: true,
-            controller: ListBuilder.verseController,
-            itemCount: currentBible.curOriginalBook[chapterIndex].length,
-            itemBuilder: (context, verseIndex) {
-              if (currentBible.curOriginalBook[chapterIndex][verseIndex][6] !=
-                  '') {
-                return buildOriginalContentWithSmallTitle(context,
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ListView.builder(
+              shrinkWrap: true,
+              controller: ListBuilder.verseController,
+              itemCount: currentBible.curOriginalBook[chapterIndex].length,
+              itemBuilder: (context, verseIndex) {
+                if (currentBible.curOriginalBook[chapterIndex][verseIndex][6] !=
+                    '') {
+                  return buildOriginalContentWithSmallTitle(context,
+                      currentBible.curOriginalBook[chapterIndex][verseIndex]);
+                }
+                return buildOriginalContent(context,
                     currentBible.curOriginalBook[chapterIndex][verseIndex]);
-              }
-              return buildOriginalContent(context,
-                  currentBible.curOriginalBook[chapterIndex][verseIndex]);
-            },
+              },
+            ),
           ),
         );
       },
@@ -108,10 +111,9 @@ class _ListBuilderState extends State<ListBuilder> {
                       textDirection: TextDirection.rtl,
                       style: const TextStyle(fontSize: 16),
                     )),
-                SizedBox(
-                  width: 320,
+                Flexible(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child:
                         buildWrappedStringWithHighlight(verse[4], toHighlight),
                   ),

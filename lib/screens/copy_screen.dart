@@ -61,7 +61,7 @@ class _CopyScreenState extends State<CopyScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '선택하기',
+              '선택',
               style: TextStyle(color: Colors.white),
             ),
           ],
@@ -72,18 +72,20 @@ class _CopyScreenState extends State<CopyScreen> {
             },
             icon: const Icon(Icons.arrow_back_ios)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
-        child: ListView.builder(
-          controller: copyController,
-          itemCount: chapter.length,
-          itemBuilder: (context, verseIndex) {
-            return AutoScrollTag(
-                key: ValueKey(verseIndex),
-                controller: copyController,
-                index: verseIndex,
-                child: buildSelectableRawContent(chapter[verseIndex]));
-          },
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
+          child: ListView.builder(
+            controller: copyController,
+            itemCount: chapter.length,
+            itemBuilder: (context, verseIndex) {
+              return AutoScrollTag(
+                  key: ValueKey(verseIndex),
+                  controller: copyController,
+                  index: verseIndex,
+                  child: buildSelectableRawContent(chapter[verseIndex]));
+            },
+          ),
         ),
       ),
       // body: ListBuilder(
@@ -118,10 +120,9 @@ class _CopyScreenState extends State<CopyScreen> {
                     textDirection: TextDirection.rtl,
                     style: const TextStyle(fontSize: 16),
                   )),
-              SizedBox(
-                width: 320,
+              Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  padding: const EdgeInsets.only(left: 4, right: 24),
                   child: buildWrappedString(verse[4]),
                 ),
               ),
