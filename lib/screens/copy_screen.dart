@@ -72,26 +72,20 @@ class _CopyScreenState extends State<CopyScreen> {
             },
             icon: const Icon(Icons.arrow_back_ios)),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
-          child: ListView.builder(
-            controller: copyController,
-            itemCount: chapter.length,
-            itemBuilder: (context, verseIndex) {
-              return AutoScrollTag(
-                  key: ValueKey(verseIndex),
-                  controller: copyController,
-                  index: verseIndex,
-                  child: buildSelectableRawContent(chapter[verseIndex]));
-            },
-          ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: ListView.builder(
+          controller: copyController,
+          itemCount: chapter.length,
+          itemBuilder: (context, verseIndex) {
+            return AutoScrollTag(
+                key: ValueKey(verseIndex),
+                controller: copyController,
+                index: verseIndex,
+                child: buildSelectableRawContent(chapter[verseIndex]));
+          },
         ),
       ),
-      // body: ListBuilder(
-      //   chapterIndex: chapter[0][1],
-      //   copyMode: true,
-      // ),
       bottomNavigationBar: buildBottomAppBar(),
     );
   }
@@ -102,7 +96,7 @@ class _CopyScreenState extends State<CopyScreen> {
         _selectBox(verse);
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Container(
           decoration: BoxDecoration(
             color: selectedVerses.contains(verse)
@@ -122,7 +116,7 @@ class _CopyScreenState extends State<CopyScreen> {
                   )),
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 4, right: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: buildWrappedString(verse[4]),
                 ),
               ),
@@ -191,7 +185,7 @@ class _CopyScreenState extends State<CopyScreen> {
                 showToast('선택된 절이 없습니다');
               } else {
                 String title =
-                    '${currentBible.curTitleList[chapter[0][0]]} ${chapter[0][1]}\n\n';
+                    '${currentBible.curTitleList[chapter[0][0]]} ${chapter[0][1] + 1}\n\n';
                 String body = '';
                 for (var text in selectedVerses) {
                   String line = '${text[3]} ${text[4]}\n';

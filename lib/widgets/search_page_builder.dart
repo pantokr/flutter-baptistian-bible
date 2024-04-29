@@ -23,7 +23,6 @@ class _SearchPageBuilder extends State<SearchPageBuilder> {
   List<dynamic> searchList = [];
   List<dynamic> searchGroup = [];
 
-  AutoScrollController searchController = AutoScrollController();
   final PageController pageController = PageController();
 
   @override
@@ -33,10 +32,16 @@ class _SearchPageBuilder extends State<SearchPageBuilder> {
   }
 
   @override
+  void didUpdateWidget(covariant SearchPageBuilder oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    _currentPage = 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
     toSearch = widget.toSearch;
     toSearchSplitted = toSearch.trim().split(' ');
-
     return buildSearchList(toSearch);
   }
 
@@ -132,11 +137,13 @@ class _SearchPageBuilder extends State<SearchPageBuilder> {
     return InkWell(
       onTap: () {
         pageController.jumpToPage(pageIndex);
-        setState(
-          () {
-            _currentPage = pageController.page!.toInt();
-          },
-        );
+        Future.delayed(Durations.short1, () {
+          setState(
+            () {
+              _currentPage = pageController.page!.toInt();
+            },
+          );
+        });
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0),

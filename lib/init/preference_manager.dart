@@ -18,15 +18,14 @@ getPref() async {
   if (pref.getInt('lastBibleIndex') == null) {
     pref.setInt('lastBibleIndex', 0);
   }
-  if (pref.getBool('darkMode') == null) {
-    pref.setBool('darkMode', false);
-  }
-
   if (pref.getStringList('historyList') == null) {
     pref.setStringList('historyList', []);
   }
   if (pref.getStringList('memoList') == null) {
     pref.setStringList('memoList', []);
+  }
+  if (pref.getBool('darkMode') == null) {
+    pref.setBool('darkMode', false);
   }
 
   if ((pref.getBool('darkMode')!) != CustomThemeMode.current.value) {

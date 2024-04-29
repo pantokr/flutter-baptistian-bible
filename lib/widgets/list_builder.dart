@@ -35,7 +35,8 @@ class ListBuilder extends StatefulWidget {
   }
 }
 
-class _ListBuilderState extends State<ListBuilder> {
+class _ListBuilderState extends State<ListBuilder>
+    with SingleTickerProviderStateMixin {
   late int chapterIndex;
   @override
   void initState() {
@@ -49,23 +50,21 @@ class _ListBuilderState extends State<ListBuilder> {
   Widget build(BuildContext context) {
     return Consumer<CurrentBible>(
       builder: (context, currentBible, child) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ListView.builder(
-              shrinkWrap: true,
-              controller: ListBuilder.verseController,
-              itemCount: currentBible.curOriginalBook[chapterIndex].length,
-              itemBuilder: (context, verseIndex) {
-                if (currentBible.curOriginalBook[chapterIndex][verseIndex][6] !=
-                    '') {
-                  return buildOriginalContentWithSmallTitle(context,
-                      currentBible.curOriginalBook[chapterIndex][verseIndex]);
-                }
-                return buildOriginalContent(context,
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: ListView.builder(
+            shrinkWrap: true,
+            controller: ListBuilder.verseController,
+            itemCount: currentBible.curOriginalBook[chapterIndex].length,
+            itemBuilder: (context, verseIndex) {
+              if (currentBible.curOriginalBook[chapterIndex][verseIndex][6] !=
+                  '') {
+                return buildOriginalContentWithSmallTitle(context,
                     currentBible.curOriginalBook[chapterIndex][verseIndex]);
-              },
-            ),
+              }
+              return buildOriginalContent(context,
+                  currentBible.curOriginalBook[chapterIndex][verseIndex]);
+            },
           ),
         );
       },
@@ -82,8 +81,15 @@ class _ListBuilderState extends State<ListBuilder> {
         listEquals(
             ListBuilder.verseHighlight.sublist(0, 3), verse.sublist(0, 3))) {
       boxColor = CustomThemeData.publicColor1;
-
       ListBuilder.verseHighlight = [];
+      // Future.delayed(
+      //   const Duration(milliseconds: 1000),
+      //   () {
+      //     setState(() {
+      //       ListBuilder.verseHighlight = [];
+      //     });
+      //   },
+      // );
     }
 
     return AutoScrollTag(
@@ -95,25 +101,28 @@ class _ListBuilderState extends State<ListBuilder> {
           openCopyScreen(context, verse);
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Container(
             decoration: BoxDecoration(
-              color: boxColor,
+              gradient: LinearGradient(
+                  begin: Alignment.center,
+                  colors: [CustomThemeData.backgroundColor, boxColor]),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                    width: 40,
-                    child: Text(
-                      verse[3].toString(),
-                      textDirection: TextDirection.rtl,
-                      style: const TextStyle(fontSize: 16),
-                    )),
+                  width: 40,
+                  child: Text(
+                    verse[3].toString(),
+                    textDirection: TextDirection.rtl,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
                 Flexible(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child:
                         buildWrappedStringWithHighlight(verse[4], toHighlight),
                   ),
