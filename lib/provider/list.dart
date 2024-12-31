@@ -124,7 +124,7 @@ const List<String> titleListKorShort = [
   '골',
   '살전',
   '살후',
-  '담전',
+  '딤전',
   '딤후',
   '딛',
   '몬',
