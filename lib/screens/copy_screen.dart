@@ -1,8 +1,7 @@
-import 'package:bible/provider/provider.dart';
-import 'package:bible/theme/theme.dart';
+import 'package:flutter_baptistian_bible/provider/provider.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';

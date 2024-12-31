@@ -1,6 +1,6 @@
-import 'package:bible/provider/provider.dart';
-import 'package:bible/widgets/search_history_builder.dart';
-import 'package:bible/widgets/search_page_builder.dart';
+import 'package:flutter_baptistian_bible/provider/provider.dart';
+import 'package:flutter_baptistian_bible/widgets/search_history_builder.dart';
+import 'package:flutter_baptistian_bible/widgets/search_page_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

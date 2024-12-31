@@ -1,7 +1,7 @@
-import 'package:bible/init/preference_manager.dart';
-import 'package:bible/init/verse_installer.dart';
-import 'package:bible/provider/list.dart';
-import 'package:bible/widgets/page_builder.dart';
+import 'package:flutter_baptistian_bible/init/preference_manager.dart';
+import 'package:flutter_baptistian_bible/init/verse_installer.dart';
+import 'package:flutter_baptistian_bible/provider/list.dart';
+import 'package:flutter_baptistian_bible/widgets/page_builder.dart';
 import 'package:flutter/foundation.dart';
 
 class CurrentBible with ChangeNotifier {

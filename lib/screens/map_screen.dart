@@ -1,11 +1,8 @@
-import 'package:bible/provider/list.dart';
-import 'package:bible/provider/provider.dart';
-import 'package:bible/screens/map_image_view.dart';
-import 'package:bible/theme/theme.dart';
-import 'package:bible/widgets/search_content_builder.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter_baptistian_bible/provider/list.dart';
+import 'package:flutter_baptistian_bible/provider/provider.dart';
+import 'package:flutter_baptistian_bible/screens/map_image_view.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MapScreen extends StatefulWidget {

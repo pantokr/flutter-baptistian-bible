@@ -1,12 +1,12 @@
-import 'package:bible/provider/provider.dart';
-import 'package:bible/screens/copy_screen.dart';
-import 'package:bible/screens/dic_search_screen.dart';
-import 'package:bible/screens/map_screen.dart';
-import 'package:bible/screens/memo_screen.dart';
-import 'package:bible/screens/search_screen.dart';
-import 'package:bible/theme/theme.dart';
-import 'package:bible/widgets/dialog.dart';
-import 'package:bible/widgets/page_builder.dart';
+import 'package:flutter_baptistian_bible/provider/provider.dart';
+import 'package:flutter_baptistian_bible/screens/copy_screen.dart';
+import 'package:flutter_baptistian_bible/screens/dic_search_screen.dart';
+import 'package:flutter_baptistian_bible/screens/map_screen.dart';
+import 'package:flutter_baptistian_bible/screens/memo_screen.dart';
+import 'package:flutter_baptistian_bible/screens/search_screen.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
+import 'package:flutter_baptistian_bible/widgets/dialog.dart';
+import 'package:flutter_baptistian_bible/widgets/page_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

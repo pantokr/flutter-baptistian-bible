@@ -1,7 +1,7 @@
-import 'package:bible/init/preference_manager.dart';
-import 'package:bible/provider/list.dart';
-import 'package:bible/provider/provider.dart';
-import 'package:bible/theme/theme.dart';
+import 'package:flutter_baptistian_bible/init/preference_manager.dart';
+import 'package:flutter_baptistian_bible/provider/list.dart';
+import 'package:flutter_baptistian_bible/provider/provider.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

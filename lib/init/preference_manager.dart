@@ -1,4 +1,4 @@
-import 'package:bible/theme/theme.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences pref;

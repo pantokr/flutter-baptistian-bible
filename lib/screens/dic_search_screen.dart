@@ -1,6 +1,6 @@
-import 'package:bible/screens/dic_search_web_view.dart';
-import 'package:bible/theme/theme.dart';
-import 'package:bible/widgets/dictionary.dart';
+import 'package:flutter_baptistian_bible/screens/dic_search_web_view.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
+import 'package:flutter_baptistian_bible/widgets/dictionary.dart';
 import 'package:flutter/material.dart';
 
 class DicSearchScreen extends StatefulWidget {

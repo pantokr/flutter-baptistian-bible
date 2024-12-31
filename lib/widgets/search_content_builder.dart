@@ -1,6 +1,6 @@
-import 'package:bible/provider/provider.dart';
-import 'package:bible/theme/theme.dart';
-import 'package:bible/widgets/list_builder.dart';
+import 'package:flutter_baptistian_bible/provider/provider.dart';
+import 'package:flutter_baptistian_bible/theme/theme.dart';
+import 'package:flutter_baptistian_bible/widgets/list_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:provider/provider.dart';

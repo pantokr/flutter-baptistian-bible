@@ -1,5 +1,5 @@
-import 'package:bible/init/preference_manager.dart';
-import 'package:bible/init/verse_installer.dart';
+import 'package:flutter_baptistian_bible/init/preference_manager.dart';
+import 'package:flutter_baptistian_bible/init/verse_installer.dart';
 
 // lbtn as Latest Bible Title Name(ex - 마태복음)
 // lbt as Latest Bible Title(ex - 0)
