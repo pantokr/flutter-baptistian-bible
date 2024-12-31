@@ -4,7 +4,7 @@
 
 <br>
 
-자세한 설명은 [pantokr.github.io](https://pantokr.github.io/2024/04/12/flutter-baptistian-bible.html)에서 확인하실 수 있습니다.
+자세한 설명은 [pantokr.github.io](https://pantokr.github.io/2024/04/12/flutter_baptistian_bible.html)에서 확인하실 수 있습니다.
 
 ---
 
@@ -12,5 +12,5 @@
 
 ### 1. Git Clone  
 ```bash
-git clone https://github.com/pantokr/flutter-baptistian-bible.git
+git clone https://github.com/pantokr/flutter_baptistian_bible.git
 ```
